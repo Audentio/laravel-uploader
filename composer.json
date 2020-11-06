@@ -1,0 +1,26 @@
+{
+    "name": "audentio/laravel-uploader",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jake Booher",
+            "email": "jakeb@audentio.com"
+        }
+    ],
+    "require": {
+        "audentio/laravel-base": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Audentio\\LaravelUploader\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Audentio\\LaravelUploader\\Providers\\UploaderServiceProvider"
+            ]
+        }
+    }
+}
