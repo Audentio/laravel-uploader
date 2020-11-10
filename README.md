@@ -73,3 +73,48 @@ if (!$model->validateUploads($uploads, $errors)) {
 ```php
 $model->attachUploads($uploads);
 ```
+
+## Uploading Files
+
+### Get an Upload
+
+GET `/api/upload/{id}`
+
+### Create Upload
+
+POST `/api/upload`
+
+Headers:
+
+Parameters:
+
+* `upload` The uploaded file
+* `content_type` The content type (Should typically match the GraphQL Type name)
+* `content_field` The upload field name (Will be defined on the input fields for the GraphQL Type associated under `uploads`)
+
+Response Example:
+
+```json
+{
+  "success": true,
+  "message": null,
+  "payload": {
+    "upload": {
+      "id": "2e5a78f3-2dfe-4298-a73d-7de03937541a",
+      "content_type": "Model",
+      "content_field": "thumbnail",
+      "variants": [
+        {
+          "file_hash": "75daeb8e884c63a7d3f3ecc3e325f606",
+          "file_type": "image\/png",
+          "file_size": 52375,
+          "width": 276,
+          "height": 146,
+          "variant": "thumb",
+          "url": "https:\/\/bucket-name.s3.us-west-1.amazonaws.com\/Uploads\/Model\/thumbnail\/2e5a78f3-2dfe-4298-a73d-7de03937541a\/thumb_fileName.png"
+        }
+      ]
+    }
+  }
+}
+```
