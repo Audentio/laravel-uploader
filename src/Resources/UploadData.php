@@ -2,8 +2,8 @@
 
 namespace Audentio\LaravelUploader\Resources;
 
-use App\Images\ImageManipulator;
 use Audentio\LaravelBase\Foundation\AbstractModel;
+use Audentio\LaravelUploader\Images\ImageManipulator;
 use Audentio\LaravelUploader\Models\Interfaces\UploadContentInterface;
 use Audentio\LaravelUploader\Models\Interfaces\UploadModelInterface;
 use Audentio\LaravelUploader\Models\Traits\UploadModelTrait;
