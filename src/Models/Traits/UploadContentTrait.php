@@ -22,7 +22,7 @@ trait UploadContentTrait
 
     public function uploads(): MorphMany
     {
-        return $this->morphMany(config('audentioUploader.uploadModel'), 'content');
+        return $this->morphMany(config('audentioUploader.uploadModel'), 'content')->orderBy('display_order');
     }
 
     public function getUploaderConfig(): array
@@ -129,15 +129,18 @@ trait UploadContentTrait
         $newUploadIds = [];
 
         foreach ($uploads as $contentField => $curUploads) {
+            $displayOrder = 0;
             $newUploadIds[$contentField] = [];
 
             foreach ($curUploads as $upload) {
+                $displayOrder++;
                 /** @var AbstractModel|UploadModelInterface|null $model */
                 $model = $upload['model'];
 
                 if ($model) {
                     $newUploadIds[$contentField][] = $model->id;
                     $model->content_id = $this->id;
+                    $model->display_order = $displayOrder;
                     $model->save();
                 }
             }
