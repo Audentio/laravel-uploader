@@ -80,7 +80,7 @@ trait UploadContentTrait
 
             foreach ($curUploads as $upload) {
                 // Skip validating this upload if already attached.
-                if ($attachedUploads->count > 0 && $attachedUploads->where('id', $upload['id'])->isNotEmpty()) {
+                if ($attachedUploads->count() > 0 && $attachedUploads->where('id', $upload['id'])->isNotEmpty()) {
                     continue;
                 }
 
