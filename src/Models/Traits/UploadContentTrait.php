@@ -87,14 +87,13 @@ trait UploadContentTrait
                     continue;
                 }
 
-                if ($model->content_id && $model->content_id !== $this->id) {
-                    $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
-                    $return = false;
-                }
-
-                // Skip validating this upload if already attached.
                 if ($model->isAttached()) {
-                    continue;
+                    if ($model->content_id !== $this->id) {
+                        $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
+                        $return = false;
+                    } else {
+                        continue;
+                    }
                 }
 
                 if (!Auth::user() || $model->user_id !== Auth::user()->id) {
