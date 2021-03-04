@@ -49,7 +49,6 @@ trait UploadContentTrait
     public function validateUploads(array $uploads, ?array &$errors = null): bool
     {
         $returnErrors = [];
-        $attachedUploads = $this->uploads;
 
         if (empty($uploads)) {
             $this->uploadsValidated = true;
@@ -79,13 +78,14 @@ trait UploadContentTrait
             }
 
             foreach ($curUploads as $upload) {
+                /** @var UploadModelInterface|null $model */
+                $model = $upload['model'];
+
                 // Skip validating this upload if already attached.
-                if ($attachedUploads->count() > 0 && $attachedUploads->where('id', $upload['id'])->isNotEmpty()) {
+                if ($model->content_id === $this->id) {
                     continue;
                 }
 
-                /** @var UploadModelInterface|null $model */
-                $model = $upload['model'];
                 if (!$model) {
                     $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadDoesntExist');
                     $return = false;
