@@ -77,6 +77,11 @@ trait UploadModelTrait
         return Storage::url($path);
     }
 
+    public function isAttached(): bool
+    {
+        return $this->content_id !== null;
+    }
+
     public static function bootUploadModelTrait(): void
     {
         // We want to do this after it's been deleted to make sure the db record is deleted even if there is some sort

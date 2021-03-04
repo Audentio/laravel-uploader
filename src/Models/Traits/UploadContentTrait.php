@@ -80,10 +80,20 @@ trait UploadContentTrait
             foreach ($curUploads as $upload) {
                 /** @var UploadModelInterface|null $model */
                 $model = $upload['model'];
+
                 if (!$model) {
                     $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadDoesntExist');
                     $return = false;
                     continue;
+                }
+
+                if ($model->isAttached()) {
+                    if ($model->content_id !== $this->id) {
+                        $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
+                        $return = false;
+                    } else {
+                        continue;
+                    }
                 }
 
                 if (!Auth::user() || $model->user_id !== Auth::user()->id) {
@@ -93,11 +103,6 @@ trait UploadContentTrait
 
                 if ($model->content_type !== get_class($this)) {
                     $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadWrongContentType');
-                    $return = false;
-                }
-
-                if ($model->content_id && $model->content_id !== $this->id) {
-                    $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
                     $return = false;
                 }
 
