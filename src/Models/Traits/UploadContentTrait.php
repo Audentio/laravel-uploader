@@ -81,14 +81,19 @@ trait UploadContentTrait
                 /** @var UploadModelInterface|null $model */
                 $model = $upload['model'];
 
-                // Skip validating this upload if already attached.
-                if ($model->content_id === $this->id) {
-                    continue;
-                }
-
                 if (!$model) {
                     $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadDoesntExist');
                     $return = false;
+                    continue;
+                }
+
+                if ($model->content_id && $model->content_id !== $this->id) {
+                    $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
+                    $return = false;
+                }
+
+                // Skip validating this upload if already attached.
+                if ($model->isAttached()) {
                     continue;
                 }
 
@@ -99,11 +104,6 @@ trait UploadContentTrait
 
                 if ($model->content_type !== get_class($this)) {
                     $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadWrongContentType');
-                    $return = false;
-                }
-
-                if ($model->content_id && $model->content_id !== $this->id) {
-                    $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
                     $return = false;
                 }
 
