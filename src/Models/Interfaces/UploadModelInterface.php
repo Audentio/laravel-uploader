@@ -14,4 +14,5 @@ interface UploadModelInterface
     public function getVariantsForGraphQL(): array;
     public function getStoragePath(): ?string;
     public function getStorageFilePath(string $variant = null): ?string;
+    public function isAttached(): bool;
 }
