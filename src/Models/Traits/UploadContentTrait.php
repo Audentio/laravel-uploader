@@ -258,6 +258,8 @@ trait UploadContentTrait
 
             $fields[$contentField] = [
                 'type' => $type,
+                'selectable' => false,
+                'with' => 'uploads',
                 'resolve' => function(UploadContentInterface $root, $args) use ($contentField, $isArray) {
                     /** @var AbstractModel|UploadContentInterface $root */
 
