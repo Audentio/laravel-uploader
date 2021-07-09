@@ -249,6 +249,9 @@ trait UploadContentTrait
         $uploadFileds = [];
 
         foreach ($instance->getUploaderConfig() as $contentField => $config) {
+            if (array_key_exists($contentField, $fields)) {
+                continue;
+            }
             $type = \GraphQL::type(config('audentioUploader.uploadGraphQLType'));
             $isArray = false;
             if ($config['max_files'] !== 1) {
