@@ -9,9 +9,9 @@ use Audentio\LaravelUploader\Models\Interfaces\UploadContentInterface;
 class LaravelUploader
 {
     protected static $runsMigrations = true;
-    const IMAGES = ['image/jpeg', 'image/gif', 'image/png', 'image/svg+xml'];
+    const IMAGES = ['image/jpeg', 'image/gif', 'image/png'];
     const FILES = [
-        'image/jpeg', 'image/gif', 'image/png', 'image/svg+xml', 'image/bmp', 'text/plain', 'audio/mp4', 'audio/mpeg',
+        'image/jpeg', 'image/gif', 'image/png', 'image/bmp', 'text/plain', 'audio/mp4', 'audio/mpeg',
         'audio/wav', 'audio/x-ms-wma', 'video/mp4', 'video/avi', 'video/mpeg', 'video/x-ms-wmv', 'video/quicktime',
         'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.template', 'application/x-gzip',
