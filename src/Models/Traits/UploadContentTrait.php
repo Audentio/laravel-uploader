@@ -33,7 +33,7 @@ trait UploadContentTrait
             $return[$contentField] = array_merge([
                 'allowed_types' => LaravelUploader::IMAGES,
                 'max_files' => 1,
-                'max_size' => 1000000, // 1 MB
+                'max_size' => config('audentioUploader.defaultMaxUploadSize'),
                 'variants' => [],
             ], $config);
         }
