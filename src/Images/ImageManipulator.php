@@ -3,12 +3,14 @@
 namespace Audentio\LaravelUploader\Images;
 
 use GuzzleHttp\Client;
-use Intervention\Image\Constraint;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Drivers\Abstract\AbstractImage;
+use Intervention\Image\EncodedImage;
+use Intervention\Image\ImageManager;
 
 class ImageManipulator
 {
     protected $imagePath;
+    protected $mimeType;
 
     protected $dimensions;
 
@@ -37,6 +39,15 @@ class ImageManipulator
     public function getHeight()
     {
         return $this->getDimensions()[1];
+    }
+
+    public function getMimeType(): string
+    {
+        if (!$this->mimeType) {
+            $this->mimeType = mime_content_type($this->imagePath) ?? 'image/jpeg';
+        }
+
+        return $this->mimeType;
     }
 
     public function optimizeImage()
@@ -90,21 +101,9 @@ class ImageManipulator
         $tempPath = tempnam('/tmp', '');
 
         $image = $this->imageObj();
-        $image->fit($width, $height, function(Constraint $constraint) {
-            $constraint->upsize();
-        });
-        $image->save($tempPath);
+        $image->fit($width, $height);
 
-        $data = [
-            'temp_path' => $tempPath,
-            'file_size' => $image->filesize(),
-            'file_type' => $image->mime(),
-            'file_hash' => md5_file($tempPath),
-            'width' => $image->width(),
-            'height' => $image->height(),
-        ];
-
-        return $data;
+        return $this->saveThumbnail($image, $tempPath);
     }
 
     public function createThumbnailToFit($width, $height)
@@ -112,28 +111,51 @@ class ImageManipulator
         $tempPath = tempnam('/tmp', '');
 
         $image = $this->imageObj();
-        $image->resize($width, $height, function(Constraint $constraint) {
-            $constraint->upsize();
-            $constraint->aspectRatio();
-        });
-        $image->save($tempPath);
+        $image->scaleDown($width, $height);
 
-        $data = [
-            'temp_path' => $tempPath,
-            'file_size' => $image->filesize(),
-            'file_type' => $image->mime(),
-            'file_hash' => md5_file($tempPath),
-            'width' => $image->width(),
-            'height' => $image->height(),
-        ];
-
-        return $data;
+        return $this->saveThumbnail($image, $tempPath);
     }
 
-    protected function imageObj()
+    public function saveThumbnail(AbstractImage $image, string $tempPath): array
     {
-        Image::configure(['driver' => 'gd']);
+        $encoded = $this->encodeImage($image);
 
-        return Image::make($this->imagePath);
+        $encoded->save($tempPath);
+        
+        return [
+            'temp_path' => $tempPath,
+            'file_size' => filesize($tempPath),
+
+            'file_type' => $encoded->mimetype(),
+            'file_hash' => md5_file($tempPath),
+            'width' => $image->size()->getWidth(),
+            'height' => $image->size()->getHeight(),
+        ];
+    }
+
+    protected function encodeImage(AbstractImage $image): EncodedImage
+    {
+        switch ($this->getMimeType()) {
+            case 'image/png':
+                return $image->toPng();
+            case 'image/jpeg':
+                return $image->toJpeg();
+            case 'image/gif':
+                return $image->toGif();
+        }
+
+        throw new \LogicException('Unable to encode type: ' . $this->getMimeType());
+    }
+
+    protected function imageObj(): AbstractImage
+    {
+        $driver = 'gd';
+        if (config('audentioUploader.useImagick')) {
+            $driver = 'imagick';
+        }
+
+        $manager = new ImageManager($driver);
+
+        return $manager->make($this->imagePath);
     }
 }
