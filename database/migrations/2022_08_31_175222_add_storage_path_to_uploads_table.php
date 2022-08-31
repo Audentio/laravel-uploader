@@ -31,11 +31,11 @@ class AddStoragePathToUploadsTable extends Migration
                     $upload->save();
                 }
             }, 'incr_id');
-        }
 
-        Schema::table('uploads', function (Blueprint $table) {
-            $table->dropColumn('file_path');
-        });
+            Schema::table('uploads', function (Blueprint $table) {
+                $table->dropColumn('file_path');
+            });
+        }
     }
 
     /**
