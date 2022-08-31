@@ -21,7 +21,7 @@ class CreateUploadsTable extends Migration
 
             $table->string('file_name');
             $table->string('file_hash');
-            $table->string('file_path');
+            // file_path removed in 1.1.0, renamed to storage_path
             $table->string('file_type');
             $table->integer('file_size');
 

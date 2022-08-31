@@ -51,9 +51,14 @@ trait UploadModelTrait
         return $this->getVariantData();
     }
 
-    public function getStoragePath(): ?string
+    public function getDefaultStoragePath(): ?string
     {
         return 'Uploads/' . ContentTypeUtil::getFriendlyContentTypeName($this->content_type) . '/' . $this->content_field . '/' . $this->id . '/';
+    }
+
+    public function getStoragePath(): ?string
+    {
+        return $this->getDefaultStoragePath();
     }
 
     public function getStorageFileName(?string $variant = null): ?string
@@ -67,14 +72,23 @@ trait UploadModelTrait
 
     public function getStorageFilePath(?string $variant = null): ?string
     {
-        return $this->getStoragePath() . $this->getStorageFileName($variant);
+        return $this->storage_path . $this->getStorageFileName($variant);
     }
 
     public function getStorageUrl(?string $variant = null)
     {
         $path = $this->getStorageFilePath($variant);
+        $pathParts = explode('/', $path);
 
-        return Storage::url($path);
+        $urlPath = '';
+        foreach ($pathParts as $key => $part) {
+            $part = urlencode($part);
+            $urlPath .= '/' . $part;
+        }
+
+        $urlPath = trim($urlPath, '/');
+
+        return Storage::url($urlPath);
     }
 
     public function isAttached(): bool

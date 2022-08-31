@@ -24,9 +24,9 @@ class UploadController extends AbstractController
 
         /** @var Upload|UploadModelInterface $upload */
         $upload = $uploadModelClass::find($id);
-        if (!$upload || !$upload->content_id) {
-            return $this->notFound();
-        }
+//        if (!$upload || !$upload->content_id) {
+//            return $this->notFound();
+//        }
 
         if ($upload->user_id !== Auth::user()->id) {
             return $this->unauthorized();

@@ -46,11 +46,13 @@ class UploadData
             'content_field' => $this->contentField,
             'user_id' => Auth::user() ? Auth::user()->id : null,
             'file_name' => $upload->getClientOriginalName(),
-            'file_path' => $model->getStoragePath(),
+            'original_file_name' => $upload->getClientOriginalName(),
             'file_hash' => md5_file($upload->getRealPath()),
             'file_type' => $upload->getMimeType(),
             'file_size' => $upload->getSize(),
         ]);
+
+        $model->storage_path = $model->getStoragePath();
 
         $variants = [
             'original' => [
