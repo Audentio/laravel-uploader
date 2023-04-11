@@ -38,7 +38,12 @@ trait UploadModelTrait
         }
 
         if (empty($variantData)) {
-            return ['file' => $variants['data']['original']];
+            return [
+                array_merge($variants['data']['original'], [
+                    'variant' => 'original',
+                    'url' => $this->getStorageUrl('original')
+                ])
+            ];
         }
 
         return $variantData;
@@ -46,8 +51,6 @@ trait UploadModelTrait
 
     public function getVariantsForGraphQL(): array
     {
-        $variants = $this->getVariantData();
-
         return $this->getVariantData();
     }
 
