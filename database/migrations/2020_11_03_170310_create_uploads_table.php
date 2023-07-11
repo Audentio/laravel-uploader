@@ -4,7 +4,7 @@ use Audentio\LaravelBase\Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUploadsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -42,4 +42,4 @@ class CreateUploadsTable extends Migration
     {
         Schema::dropIfExists('uploads');
     }
-}
+};

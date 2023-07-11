@@ -4,7 +4,7 @@ use Audentio\LaravelBase\Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class AddStoragePathToUploadsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -65,4 +65,4 @@ class AddStoragePathToUploadsTable extends Migration
             $table->dropColumn(['storage_path', 'original_file_name']);
         });
     }
-}
+};

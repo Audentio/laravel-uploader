@@ -19,6 +19,8 @@ trait UploadModelTrait
             'id' => $this->id,
             'content_type' => ContentTypeUtil::getFriendlyContentTypeName($this->content_type),
             'content_field' => $this->content_field,
+            'primary_color' => $this->primary_color,
+            'colors' => $this->colors,
             'variants' => $this->getVariantData(),
         ];
     }
@@ -94,6 +96,13 @@ trait UploadModelTrait
     public function isAttached(): bool
     {
         return $this->content_id !== null;
+    }
+
+    public function initializeUploadModelTrait(): void
+    {
+        $this->casts['colors'] = 'array';
+        $this->casts['variants'] = 'array';
+        $this->casts['meta'] = 'array';
     }
 
     public static function bootUploadModelTrait(): void

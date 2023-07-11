@@ -2,6 +2,7 @@
 
 namespace Audentio\LaravelUploader\Images;
 
+use ColorThief\ColorThief;
 use GuzzleHttp\Client;
 use Intervention\Image\Drivers\Abstract\AbstractImage;
 use Intervention\Image\EncodedImage;
@@ -29,6 +30,22 @@ class ImageManipulator
             $this->dimensions[0],
             $this->dimensions[1],
         ];
+    }
+
+    public function getDominantColor(): string
+    {
+        return ColorThief::getColor($this->imagePath, outputFormat: 'hex');
+    }
+
+    public function getColorPalette(int $colorCount = 10): array
+    {
+        $dominantColor = $this->getDominantColor();
+        $additionalColors = ColorThief::getPalette($this->imagePath, $colorCount, outputFormat: 'hex');
+        if (!in_array($dominantColor, $additionalColors)) {
+            array_unshift($additionalColors, $dominantColor);
+        }
+
+        return array_slice($additionalColors, 0, $colorCount);
     }
 
     public function getWidth()

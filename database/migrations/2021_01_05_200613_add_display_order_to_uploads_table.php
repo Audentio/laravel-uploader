@@ -4,7 +4,7 @@ use Audentio\LaravelBase\Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
-class AddDisplayOrderToUploadsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -29,4 +29,4 @@ class AddDisplayOrderToUploadsTable extends Migration
             $table->dropColumn('display_order');
         });
     }
-}
+};

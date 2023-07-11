@@ -52,6 +52,13 @@ class UploadData
             'file_size' => $upload->getSize(),
         ]);
 
+        if ($this->isImage()) {
+            $model->forceFill([
+                'primary_color' => $this->imageManipulator?->getDominantColor(),
+                'colors' => $this->imageManipulator?->getColorPalette(),
+            ]);
+        }
+
         $model->storage_path = $model->getStoragePath();
 
         $variants = [
