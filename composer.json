@@ -10,8 +10,8 @@
     ],
     "require": {
         "php": "^8.0",
-        "ext-fileinfo": "*",
-        "audentio/laravel-base": "^2.0",
+        "ext-fileinfo": "*",\
+      "audentio/laravel-base": "^1.1|^2.0",
         "illuminate/contracts": "^9.0|^10.0",
         "illuminate/support": "^9.0|^10.0",
         "intervention/image": "3.0.0-alpha.3",
