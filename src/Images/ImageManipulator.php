@@ -3,6 +3,7 @@
 namespace Audentio\LaravelUploader\Images;
 
 use ColorThief\ColorThief;
+use ColorThief\Exception\NotSupportedException;
 use GuzzleHttp\Client;
 use Intervention\Image\Drivers\Abstract\AbstractImage;
 use Intervention\Image\EncodedImage;
@@ -11,6 +12,8 @@ use Intervention\Image\ImageManager;
 class ImageManipulator
 {
     protected $imagePath;
+    protected $hasSafeImage = null;
+    protected $safeImagePath;
     protected $mimeType;
 
     protected $dimensions;
@@ -32,20 +35,49 @@ class ImageManipulator
         ];
     }
 
-    public function getDominantColor(): string
+    public function getDominantColor(): ?string
     {
-        return ColorThief::getColor($this->imagePath, outputFormat: 'hex');
+        $safeImagePath = $this->getSafeImagePath();
+        if (!$safeImagePath) {
+            return null;
+        }
+
+        try {
+            return ColorThief::getColor($safeImagePath, outputFormat: 'hex');
+        } catch (NotSupportedException $e) {
+            return null;
+        }
     }
 
-    public function getColorPalette(int $colorCount = 10): array
+    public function getColorPalette(int $colorCount = 10): ?array
     {
+        $safeImagePath = $this->getSafeImagePath();
+        if (!$safeImagePath) {
+            return null;
+        }
+
         $dominantColor = $this->getDominantColor();
-        $additionalColors = ColorThief::getPalette($this->imagePath, $colorCount, outputFormat: 'hex');
+        try {
+            $additionalColors = ColorThief::getPalette($safeImagePath, $colorCount, outputFormat: 'hex');
+        } catch (NotSupportedException $e) {
+            $additionalColors = [];
+        }
         if (!in_array($dominantColor, $additionalColors)) {
             array_unshift($additionalColors, $dominantColor);
         }
 
-        return array_slice($additionalColors, 0, $colorCount);
+        $uniqueColors = [];
+        foreach ($additionalColors as $color) {
+            if (!$color) {
+                continue;
+            }
+
+            if (!in_array($color, $uniqueColors)) {
+                $uniqueColors[] = $color;
+            }
+        }
+
+        return array_slice($uniqueColors, 0, $colorCount);
     }
 
     public function getWidth()
@@ -148,6 +180,39 @@ class ImageManipulator
             'width' => $image->size()->getWidth(),
             'height' => $image->size()->getHeight(),
         ];
+    }
+
+    protected function getSafeImagePath(): ?string
+    {
+        if ($this->hasSafeImage === null) {
+            $this->safeImagePath = tempnam('/tmp', '');
+            $mimeType = $this->getMimeType();
+
+            $image = null;
+            switch ($mimeType) {
+                case 'image/png':
+                    $image = imagecreatefrompng($this->imagePath);
+                    break;
+                case 'image/jpeg':
+                    $image = imagecreatefromjpeg($this->imagePath);
+                    break;
+                case 'image/gif':
+                    $image = imagecreatefromgif($this->imagePath);
+                    break;
+            }
+
+            if (!$image) {
+                $this->hasSafeImage = false;
+                $this->safeImagePath = null;
+                return null;
+            }
+
+            imagejpeg($image, $this->safeImagePath, 100);
+            imagedestroy($image);
+            $this->hasSafeImage = true;
+        }
+
+        return $this->safeImagePath;
     }
 
     protected function encodeImage(AbstractImage $image): EncodedImage
