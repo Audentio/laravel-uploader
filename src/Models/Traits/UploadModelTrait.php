@@ -2,16 +2,17 @@
 
 namespace Audentio\LaravelUploader\Models\Traits;
 
-use App\Models\User;
-use Audentio\LaravelBase\Foundation\Traits\ContentTypeTrait;
 use Audentio\LaravelBase\Utils\ContentTypeUtil;
 use Audentio\LaravelUploader\Models\Interfaces\UploadModelInterface;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 trait UploadModelTrait
 {
-    use ContentTypeTrait;
+    public function contentUploads(): HasMany
+    {
+        return $this->hasMany(config('audentioUploader.contentUploadModel'));
+    }
 
     public function getApiData(): array
     {
@@ -98,7 +99,16 @@ trait UploadModelTrait
 
     public function isAttached(): bool
     {
-        return $this->content_id !== null;
+        return $this->contentUploads()->exists();
+    }
+
+    public function rebuildContentCount(bool $save = true): void
+    {
+        $this->content_count = $this->contentUploads()->count();
+
+        if ($save) {
+            $this->save();
+        }
     }
 
     public function initializeUploadModelTrait(): void
@@ -106,6 +116,7 @@ trait UploadModelTrait
         $this->casts['colors'] = 'array';
         $this->casts['variants'] = 'array';
         $this->casts['meta'] = 'array';
+        $this->guarded = [];
     }
 
     public static function bootUploadModelTrait(): void

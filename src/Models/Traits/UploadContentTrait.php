@@ -2,15 +2,14 @@
 
 namespace Audentio\LaravelUploader\Models\Traits;
 
+use App\Models\Upload;
 use Audentio\LaravelBase\Foundation\AbstractModel;
 use Audentio\LaravelGraphQL\GraphQL\Definitions\Type;
 use Audentio\LaravelUploader\LaravelUploader;
 use Audentio\LaravelUploader\Models\Interfaces\UploadContentInterface;
 use Audentio\LaravelUploader\Models\Interfaces\UploadModelInterface;
 use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\ObjectType;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\MessageBag;
@@ -20,9 +19,11 @@ trait UploadContentTrait
     protected static $uploadModelInstance;
     protected $uploadsValidated = false;
 
-    public function uploads(): MorphMany
+    public function uploads(): MorphToMany
     {
-        return $this->morphMany(config('audentioUploader.uploadModel'), 'content')->orderBy('display_order');
+        return $this->morphToMany(config('audentioUploader.uploadModel'), 'content', 'content_upload')
+            ->using(config('audentioUploader.contentUploadModel'))
+            ->orderBy('display_order');
     }
 
     public function getUploaderConfig(): array
@@ -144,9 +145,12 @@ trait UploadContentTrait
 
                 if ($model) {
                     $newUploadIds[$contentField][] = $model->id;
-                    $model->content_id = $this->id;
-                    $model->display_order = $displayOrder;
-                    $model->save();
+                    $this->uploads()->attach($model->id, [
+                        'display_order' => $displayOrder,
+                    ]);
+//                    $model->content_id = $this->id;
+//                    $model->display_order = $displayOrder;
+//                    $model->save();
                 }
             }
         }
@@ -160,7 +164,7 @@ trait UploadContentTrait
             /** @var AbstractModel|UploadModelInterface $upload */
             foreach ($contentFieldUploads as $upload) {
                 if (!in_array($upload->id, $uploadIds)) {
-                    $upload->delete();
+                    $this->uploads()->detach($upload->id);
                 }
             }
         }
@@ -294,7 +298,13 @@ trait UploadContentTrait
     {
         static::deleting(function(UploadContentInterface $model) {
             try {
-                $model->uploads()->delete();
+                $uploadIds = [];
+                /** @var Upload $upload */
+                foreach ($model->uploads as $upload) {
+                    $uploadIds[] = $upload->id;
+                }
+
+                $model->uploads()->detach($uploadIds);
             } catch (\Exception $e) {}
         });
     }

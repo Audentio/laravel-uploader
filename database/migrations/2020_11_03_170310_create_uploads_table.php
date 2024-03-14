@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('uploads', function (Blueprint $table) {
             $table->id();
             $table->morphsNullable('content');
+            $table->string('content_type')->nullable()->index();
+            // content_id removed with 1.2.0, moved to content_upload pivot table
             $table->string('content_field');
             $table->remoteId('user_id')->index()->nullable();
 

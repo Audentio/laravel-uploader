@@ -3,6 +3,7 @@
 namespace Audentio\LaravelUploader\Resources;
 
 use Audentio\LaravelBase\Foundation\AbstractModel;
+use Audentio\LaravelBase\Utils\ContentTypeUtil;
 use Audentio\LaravelUploader\Images\ImageManipulator;
 use Audentio\LaravelUploader\Models\Interfaces\UploadContentInterface;
 use Audentio\LaravelUploader\Models\Interfaces\UploadModelInterface;
@@ -162,7 +163,7 @@ class UploadData
 
     public function __construct(string $contentType, string $contentField, UploadedFile $upload)
     {
-        $this->contentType = $contentType;
+        $this->contentType = ContentTypeUtil::getModelClassNameForContentType($contentType);
         $this->contentField = $contentField;
         $this->upload = $upload;
     }

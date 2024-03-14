@@ -2,12 +2,11 @@
 
 namespace Audentio\LaravelUploader\Models\Interfaces;
 
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 interface UploadContentInterface
 {
-    public function uploads(): MorphMany;
+    public function uploads(): MorphToMany;
 
     public function getUploaderFields(): array;
     public function getUploaderConfig(): array;
