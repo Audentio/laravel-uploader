@@ -88,14 +88,14 @@ trait UploadContentTrait
                     continue;
                 }
 
-                if ($model->isAttached()) {
-                    if ($model->content_id !== $this->id) {
-                        $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
-                        $return = false;
-                    } else {
-                        continue;
-                    }
-                }
+//                if ($model->isAttached()) {
+//                    if ($model->content_id !== $this->id) {
+//                        $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
+//                        $return = false;
+//                    } else {
+//                        continue;
+//                    }
+//                }
 
                 if (!Auth::user() || $model->user_id !== Auth::user()->id) {
                     $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadDoesntExist');
