@@ -23,6 +23,7 @@ trait UploadContentTrait
     {
         return $this->morphToMany(config('audentioUploader.uploadModel'), 'content', 'content_upload')
             ->using(config('audentioUploader.contentUploadModel'))
+            ->withPivot(['display_order'])
             ->orderBy('display_order');
     }
 
