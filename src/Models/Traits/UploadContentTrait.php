@@ -89,14 +89,21 @@ trait UploadContentTrait
                     continue;
                 }
 
-//                if ($model->isAttached()) {
-//                    if ($model->content_id !== $this->id) {
-//                        $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
-//                        $return = false;
-//                    } else {
-//                        continue;
-//                    }
-//                }
+                if ($model->isAttached()) {
+                    $isAttachedToThisContent = false;
+                    foreach ($model->contentUploads as $contentUpload) {
+                        if ($contentUpload->content_id === $this->id) {
+                            $isAttachedToThisContent = true;
+                            break;
+                        }
+                    }
+                    if (!$isAttachedToThisContent) {
+                        $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadAssociatedWithContent');
+                        $return = false;
+                    } else {
+                        continue;
+                    }
+                }
 
                 if (!Auth::user() || $model->user_id !== Auth::user()->id) {
                     $returnErrors[$contentField][] = __('audentioUploader::uploads.errors.uploadDoesntExist');
@@ -122,7 +129,11 @@ trait UploadContentTrait
         if ($return) {
             $this->uploadsValidated = true;
         } else {
-            $errors = ['uploads' => [$returnErrors]];
+            $uploadErrors = [];
+            foreach ($returnErrors as $contentField => $curErrors) {
+                $uploadErrors[$contentField] = implode("\n", $curErrors);
+            }
+            $errors = ['uploads' => $uploadErrors];
         }
         return $return;
     }
