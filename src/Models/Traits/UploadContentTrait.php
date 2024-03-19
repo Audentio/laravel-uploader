@@ -122,7 +122,7 @@ trait UploadContentTrait
         if ($return) {
             $this->uploadsValidated = true;
         } else {
-            $errors = ['uploads' => new MessageBag($returnErrors)];
+            $errors = ['uploads' => [$returnErrors]];
         }
         return $return;
     }
