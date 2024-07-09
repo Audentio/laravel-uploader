@@ -33,6 +33,9 @@ trait UploadControllerTrait
         $validator = \Validator::make($request->all(), [
             'content_type' => ['required', function($attribute, $value, $fail) use ($request) {
                 if (!$this->validateContentTypeForUpload($value, $error)) {
+                    if (is_array($error)) {
+                        $error = implode("\n", $error);
+                    }
                     $fail($error);
                 }
             }],
@@ -45,6 +48,9 @@ trait UploadControllerTrait
                 }
 
                 if (!$this->validateContentFieldForUpload($contentType, $value, $error)) {
+                    if (is_array($error)) {
+                        $error = implode("\n", $error);
+                    }
                     $fail($error);
                 }
             }],
@@ -61,6 +67,9 @@ trait UploadControllerTrait
                 }
 
                 if (!$this->validateFileForUpload($contentType, $contentField, $value, $error)) {
+                    if (is_array($error)) {
+                        $error = implode("\n", $error);
+                    }
                     $fail($error);
                 }
             }],
