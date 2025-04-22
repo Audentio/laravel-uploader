@@ -33,9 +33,10 @@ trait UploadModelTrait
 
         if (!empty($variants['map'])) {
             foreach ($variants['map'] as $variant => $mapped) {
+                $url = $this->getStorageUrl($variant);
                 $variantData[] = array_merge($variants['data'][$mapped], [
                     'variant' => $variant,
-                    'url' => $this->getStorageUrl($variant),
+                    'url' => $url,
                 ]);
             }
         }
@@ -94,7 +95,15 @@ trait UploadModelTrait
 
         $urlPath = trim($urlPath, '/');
 
-        return Storage::url($urlPath);
+        $url = Storage::url($urlPath);
+        if (str_contains($url, '?')) {
+            $url .= '&';
+        } else {
+            $url .= '?';
+        }
+        $url .= '_v=' . md5($this->updated_at->timestamp);
+
+        return $url;
     }
 
     public function isAttached(): bool

@@ -23,6 +23,37 @@ class UploadData
     /** @var ImageManipulator|null */
     protected $imageManipulator;
 
+    public function rebuild(UploadModelInterface $model): void
+    {
+        $upload = $this->getUpload();
+
+        if ($this->isImage()) {
+            $this->imageManipulator = new ImageManipulator($upload->getRealPath());
+        }
+
+        $modelClass = config('audentioUploader.uploadModel');
+
+        $variants = [
+            'original' => [
+                'file_hash' => md5_file($upload->getRealPath()),
+                'file_type' => $upload->getMimeType(),
+                'file_size' => $upload->getSize(),
+
+                'width' => $this->isImage() ? $this->imageManipulator->getWidth() : null,
+                'height' => $this->isImage() ? $this->imageManipulator->getHeight() : null,
+            ],
+        ];
+
+        $variantMap = $this->createAndUploadVariants($model, $variants);
+
+        $model->variants = [
+            'data' => $variants,
+            'map' => $variantMap,
+        ];
+
+        $model->save();
+    }
+
     /**
      * @return Upload|UploadModelTrait
      *
