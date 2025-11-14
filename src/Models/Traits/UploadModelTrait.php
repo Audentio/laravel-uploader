@@ -101,7 +101,7 @@ trait UploadModelTrait
         } else {
             $url .= '?';
         }
-        $url .= '_v=' . md5($this->updated_at->timestamp);
+        $url .= '_v=' . md5($this->updated_at?->timestamp ?? now()->timestamp);
 
         return $url;
     }
