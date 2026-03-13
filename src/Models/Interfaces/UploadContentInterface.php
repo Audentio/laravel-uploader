@@ -15,4 +15,6 @@ interface UploadContentInterface
     public function attachUploads(array $uploads): void;
 
     public static function setupUploadArgs(array &$args): array;
+
+    public function handleUploadDeletion(UploadModelInterface $upload, bool $save = true): void;
 }

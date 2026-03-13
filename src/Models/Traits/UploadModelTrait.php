@@ -3,6 +3,9 @@
 namespace Audentio\LaravelUploader\Models\Traits;
 
 use Audentio\LaravelBase\Utils\ContentTypeUtil;
+use Audentio\LaravelUploader\Models\ContentUpload;
+use Audentio\LaravelUploader\Models\Interfaces\ContentUploadModelInterfaces;
+use Audentio\LaravelUploader\Models\Interfaces\UploadContentInterface;
 use Audentio\LaravelUploader\Models\Interfaces\UploadModelInterface;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
@@ -136,6 +139,9 @@ trait UploadModelTrait
             try {
                 Storage::deleteDirectory($upload->getStoragePath());
             } catch (\Exception $e) {}
+            $upload->contentUploads->each(function (ContentUploadModelInterfaces $contentUpload) use ($upload) {
+                $contentUpload->content->handleUploadDeletion($upload);
+            });
         });
     }
 }

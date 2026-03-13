@@ -184,6 +184,11 @@ trait UploadContentTrait
         $this->load('uploads');
     }
 
+    public function handleUploadDeletion(UploadModelInterface $upload, bool $save = true): void
+    {
+
+    }
+
     public static function setupUploadArgs(array &$args): array
     {
         if (!array_key_exists('uploads', $args)) {

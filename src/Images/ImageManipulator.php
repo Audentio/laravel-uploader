@@ -5,8 +5,8 @@ namespace Audentio\LaravelUploader\Images;
 use ColorThief\ColorThief;
 use ColorThief\Exception\NotSupportedException;
 use GuzzleHttp\Client;
-use Intervention\Image\Drivers\Abstract\AbstractImage;
 use Intervention\Image\EncodedImage;
+use Intervention\Image\Interfaces\ImageInterface;
 use Intervention\Image\ImageManager;
 
 class ImageManipulator
@@ -150,7 +150,7 @@ class ImageManipulator
         $tempPath = tempnam('/tmp', '');
 
         $image = $this->imageObj();
-        $image->fit($width, $height);
+        $image->cover($width, $height);
 
         return $this->saveThumbnail($image, $tempPath);
     }
@@ -165,7 +165,7 @@ class ImageManipulator
         return $this->saveThumbnail($image, $tempPath);
     }
 
-    public function saveThumbnail(AbstractImage $image, string $tempPath): array
+    public function saveThumbnail(ImageInterface $image, string $tempPath): array
     {
         $encoded = $this->encodeImage($image);
 
@@ -177,8 +177,8 @@ class ImageManipulator
 
             'file_type' => $encoded->mimetype(),
             'file_hash' => md5_file($tempPath),
-            'width' => $image->size()->getWidth(),
-            'height' => $image->size()->getHeight(),
+            'width' => $image->size()->width(),
+            'height' => $image->size()->height(),
         ];
     }
 
@@ -215,29 +215,24 @@ class ImageManipulator
         return $this->safeImagePath;
     }
 
-    protected function encodeImage(AbstractImage $image): EncodedImage
+    protected function encodeImage(ImageInterface $image): EncodedImage
     {
-        switch ($this->getMimeType()) {
-            case 'image/png':
-                return $image->toPng();
-            case 'image/jpeg':
-                return $image->toJpeg();
-            case 'image/gif':
-                return $image->toGif();
-        }
-
-        throw new \LogicException('Unable to encode type: ' . $this->getMimeType());
+        return match ($this->getMimeType()) {
+            'image/png' => $image->toPng(),
+            'image/jpeg' => $image->toJpeg(),
+            'image/gif' => $image->toGif(),
+            default => throw new \LogicException('Unable to encode type: ' . $this->getMimeType()),
+        };
     }
 
-    protected function imageObj(): AbstractImage
+    protected function imageObj(): ImageInterface
     {
-        $driver = 'gd';
         if (config('audentioUploader.useImagick')) {
-            $driver = 'imagick';
+            $manager = ImageManager::imagick();
+        } else {
+            $manager = ImageManager::gd();
         }
 
-        $manager = new ImageManager($driver);
-
-        return $manager->make($this->imagePath);
+        return $manager->read($this->imagePath);
     }
 }
