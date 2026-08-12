@@ -188,16 +188,26 @@ class ImageManipulator
             $this->safeImagePath = tempnam('/tmp', '');
             $mimeType = $this->getMimeType();
 
+            // Diagnostics are suppressed deliberately. GD's decoders emit E_WARNING for
+            // recoverable defects it then decodes anyway — most commonly
+            // "libpng warning: iCCP: known incorrect sRGB profile", which is a cosmetic
+            // colour-profile complaint produced by plenty of ordinary editors. Laravel's
+            // HandleExceptions promotes any warning to an ErrorException, so an
+            // unsuppressed call throws straight out of getDominantColor() and fails the
+            // entire upload for an image GD was perfectly happy to read.
+            //
+            // A false return is the real failure signal, and the check below already
+            // handles it by reporting "no safe image" rather than throwing.
             $image = null;
             switch ($mimeType) {
                 case 'image/png':
-                    $image = imagecreatefrompng($this->imagePath);
+                    $image = @imagecreatefrompng($this->imagePath);
                     break;
                 case 'image/jpeg':
-                    $image = imagecreatefromjpeg($this->imagePath);
+                    $image = @imagecreatefromjpeg($this->imagePath);
                     break;
                 case 'image/gif':
-                    $image = imagecreatefromgif($this->imagePath);
+                    $image = @imagecreatefromgif($this->imagePath);
                     break;
             }
 
