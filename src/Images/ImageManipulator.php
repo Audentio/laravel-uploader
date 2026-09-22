@@ -231,6 +231,11 @@ class ImageManipulator
             'image/png' => $image->toPng(),
             'image/jpeg' => $image->toJpeg(),
             'image/gif' => $image->toGif(),
+            'image/webp' => $image->toWebp(),
+            // AVIF is deliberately absent: Intervention ships an AvifEncoder, but GD only
+            // exposes it when PHP was built with libavif, and it is missing on builds we
+            // run. Adding the arm would turn an unsupported format into a runtime failure
+            // that depends on the host. Add it behind a capability check if it is wanted.
             default => throw new \LogicException('Unable to encode type: ' . $this->getMimeType()),
         };
     }

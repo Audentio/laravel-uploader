@@ -9,7 +9,10 @@ use Audentio\LaravelUploader\Models\Interfaces\UploadContentInterface;
 class LaravelUploader
 {
     protected static $runsMigrations = true;
-    const IMAGES = ['image/jpeg', 'image/gif', 'image/png'];
+    // WebP needs GD built with libwebp (imagewebp). That is the default on current PHP
+    // builds; a host without it will fail at encode rather than at validation, so check
+    // before upgrading if you run an unusual build.
+    const IMAGES = ['image/jpeg', 'image/gif', 'image/png', 'image/webp'];
     const FILES = [
         'image/jpeg', 'image/gif', 'image/png', 'image/bmp', 'text/plain', 'audio/mp4', 'audio/mpeg',
         'audio/wav', 'audio/x-ms-wma', 'video/mp4', 'video/avi', 'video/mpeg', 'video/x-ms-wmv', 'video/quicktime',
